@@ -1,6 +1,5 @@
 const pool = require("../database/db");
 
-// =============================== repeated SQL =========================================
 // get details from Survey Question database -- qns 5 & 7
 module.exports.getSurveyQnsDetails = (qnsId, callback) => {
     const SQL = `
@@ -20,7 +19,6 @@ module.exports.checkQuestionIdExist = (qnsId, callback) => {
     pool.query(SQL, VALUES, callback);
 };
 
-// ================================= question 5 =========================================
 // post new question in Survey Question database
 module.exports.createNewQns = (qns, userId, callback) => {
     const SQL = `
@@ -30,7 +28,7 @@ module.exports.createNewQns = (qns, userId, callback) => {
     pool.query(SQL, VALUES, callback);
 };
 
-// ================================= question 6 =========================================
+
 // get all questions from Survey Question database
 module.exports.getAllQuestions = (callback) => {
     const SQL = `
@@ -39,7 +37,7 @@ module.exports.getAllQuestions = (callback) => {
     pool.query(SQL, callback);
 };
 
-// ================================= question 7 =========================================
+
 // check if user and questions are associated in Survey Question database
 module.exports.checkUsernQnsAssociate = (userId, qnsId, callback) => {
     const SQL = `
@@ -59,7 +57,7 @@ module.exports.updateQnsUsingId = (userId, qnsId, updateDetails, callback) => {
     pool.query(SQL, VALUES, callback);
 };
 
-// ================================= question 8 =========================================
+
 // check if user answered the specific question
 module.exports.checkUserAnswerDatabase = (userId, qnsId, callback) => {
     const SQL = `
@@ -87,7 +85,7 @@ module.exports.deleteSpecificQns = (qnsId, callback) => {
     pool.query(SQL, VALUES, callback);
 };
 
-// ================================= question 9 =========================================
+
 // check if user exists in User
 module.exports.checkUserIdExist = (userId, callback) => {
     const SQL = `
@@ -125,7 +123,7 @@ module.exports.adding5Points = (userId, callback) => {
     pool.query(SQL, VALUES, callback);
 };
 
-// ================================= question 10 =========================================
+
 // get the specific question's answers
 module.exports.getQuestionswAnswers = (qnsId, callback) => {
     const SQL = `
