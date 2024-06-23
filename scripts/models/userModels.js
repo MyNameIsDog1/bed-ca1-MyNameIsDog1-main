@@ -1,6 +1,6 @@
 const pool = require("../database/db");
 
-// =============================== repeated SQL =========================================
+
 // check if username exists in User database -- used in qns 1 & 4
 module.exports.checkIfUsernameExist = (username, callback) => {
     const SQL = `
