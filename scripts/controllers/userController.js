@@ -1,7 +1,7 @@
 const model = require("../models/userModels");
 
-// =============================== repeated middleware =========================================
-// check if username exists in database -- used in qns 1 & 4
+
+// check if username exists 
 module.exports.checkUsernameExist = (req, res, next) => {
     const username = req.body.username;
 
@@ -21,7 +21,7 @@ module.exports.checkUsernameExist = (req, res, next) => {
     });
 };
 
-// check if user ID exists in database -- used in qns 3 & 4
+// check if user ID exists in database 
 module.exports.checkUserIDExist = (req, res, next) => {
     const userId = req.params.user_id;
 
@@ -45,7 +45,7 @@ module.exports.checkUserIDExist = (req, res, next) => {
     });
 };
 
-// ================================= question 1 =========================================
+
 // create the user
 module.exports.createUser = (req, res, next) => {
     const username = req.body.username;
@@ -78,8 +78,8 @@ module.exports.printUserDetails = (req, res) => {
     });
 };
 
-// ================================= question 2 =========================================
-// get all users from database
+
+// get all users 
 module.exports.getUsers = (req, res) => {
     model.getAllUsers((error, results) => {
         if (error) {
@@ -96,7 +96,6 @@ module.exports.getUsers = (req, res) => {
     });
 };
 
-// ================================= question 3 =========================================
 // check number of completed questions
 module.exports.checkCompletedQns = (req, res, next) => {
     const participantId = req.params.user_id;
@@ -131,7 +130,7 @@ module.exports.getUserInfoNCompletedQns = (req, res) => {
     res.status(200).json(final);
 };
 
-// ================================= question 4 =========================================
+
 // update username
 module.exports.updateUsername = (req, res, next) => {
     const userId = req.params.user_id;

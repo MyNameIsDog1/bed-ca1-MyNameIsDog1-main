@@ -1,7 +1,6 @@
 // REQUIRE MODULES
 const model = require("../models/questionsModels");
 
-// =============================== repeated middleware =========================================
 // Print survey questions -- used in qns 5 & 7
 module.exports.printSurveryQuestion = (req, res, next) => {
     const qnsId = res.locals.qnsId;
@@ -15,7 +14,7 @@ module.exports.printSurveryQuestion = (req, res, next) => {
     });
 };
 
-// Check if user exists in User database -- used in qns 5 & 9
+// Check if user exists  
 module.exports.checkUserIDExist = (req, res, next) => {
     const userId = req.body.user_id;
     if (!userId) {
@@ -36,7 +35,7 @@ module.exports.checkUserIDExist = (req, res, next) => {
     });
 };
 
-// Check if question id exists -- used in qns 7 & 8 & 9
+// Check if question id exists 
 module.exports.checkQnsIdExist = (req, res, next) => {
     const qnsId = req.params.question_id;
 
@@ -58,7 +57,7 @@ module.exports.checkQnsIdExist = (req, res, next) => {
     });
 };
 
-// ================================= question 5 =========================================
+
 // Create new question
 module.exports.createQuestion = (req, res, next) => {
     const { question: qns, user_id: userId } = req.body;
@@ -77,7 +76,6 @@ module.exports.createQuestion = (req, res, next) => {
     });
 };
 
-// ================================= question 6 =========================================
 // Get all questions from database
 module.exports.getQuestions = (req, res) => {
     model.getAllQuestions((error, results) => {
@@ -90,7 +88,6 @@ module.exports.getQuestions = (req, res) => {
     });
 };
 
-// ================================= question 7 =========================================
 // Check if user and questions are associated
 module.exports.checkIfUsernQnsAreAssociated = (req, res, next) => {
     const { user_id: userId } = req.body;
@@ -133,7 +130,6 @@ module.exports.updateQns = (req, res, next) => {
     });
 };
 
-// ================================= question 8 =========================================
 // Check if question is associated with user answer
 module.exports.checkUserAnswerTable = (req, res, next) => {
     const { userId, qnsId } = res.locals;
@@ -152,7 +148,7 @@ module.exports.checkUserAnswerTable = (req, res, next) => {
     });
 };
 
-// Delete responses in UserAnswer database
+// Delete response
 module.exports.deleteUserAnswer = (req, res, next) => {
     const answerId = res.locals.answerId;
     if (answerId === 0) {
@@ -183,7 +179,6 @@ module.exports.deleteQns = (req, res) => {
     });
 };
 
-// ================================= question 9 =========================================
 // Create the answer
 module.exports.createAnswer = (req, res, next) => {
     const data = {
@@ -248,8 +243,8 @@ module.exports.addPoints = (req, res) => {
     });
 };
 
-// ================================= question 10 =========================================
-// Retrieve answers given by participant on a particular question
+
+// Retrieve answers given by participant 
 module.exports.getQuestionswAnswers = (req, res) => {
     const qnsId = req.params.question_id;
     model.getQuestionswAnswers(qnsId, (error, results) => {
