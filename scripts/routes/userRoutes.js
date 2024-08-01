@@ -1,21 +1,45 @@
-// REQUIRE EXPRESS
-const express = require("express");
-
-// CREATE ROUTER
+const express = require('express');
 const router = express.Router();
+const userController = require('../controllers/userController');
+const jwt = require('jsonwebtoken');
+const questController = require('../controllers/questController'); // Add this line to import questController
+// JWT authentication middleware
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-// REQUIRE CONTROLLER
-const userController = require("../controllers/userController");
+    if (!token) {
+        return res.status(401).json({ message: 'Authentication token is missing!' });
+    }
 
-//ALL ROUTES
-// section A (1) 
-router.post("/", userController.checkUsernameExist, userController.createUser, userController.printUserDetails); 
-// section A (2)
-router.get("/", userController.getUsers); 
-// section A (3)
-router.get("/:user_id", userController.checkUserIDExist, userController.checkCompletedQns, userController.getUserInfoNCompletedQns);
-// section A (4)
-router.put("/:user_id", userController.checkUserIDExist, userController.checkUsernameExist, userController.updateUsername, userController.printUserDetailsQn4); 
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid token!' });
+        }
+        req.user = user;
+        next();
+    });
+}
+router.get('/count', userController.getUserCount);
+// Registration route with validation and rate limiting
+router.post('/register', userController.validateRegistration, userController.register);
 
-// EXPORT ROUTER
-module.exports = router
+// Login route with rate limiting
+router.post('/login', userController.login);
+
+// Fetch user details route
+router.get('/me', authenticateToken, userController.getMe);
+
+// Fetching all users requires authentication
+router.get('/', authenticateToken, userController.getUsers);
+
+// Fetching and updating specific user data requires authentication and checks for existing userID
+router.get('/:user_id', authenticateToken, userController.checkUserIDExist, userController.getUserInfoNCompletedQns);
+router.put('/:user_id', authenticateToken, userController.checkUserIDExist, userController.updateUsername);
+router.get('/users', userController.getUsers);
+
+// New count routes
+router.get('/users/count', userController.getUserCount);
+router.get('/quests/count', questController.getQuestCount);
+// Export router
+module.exports = router;

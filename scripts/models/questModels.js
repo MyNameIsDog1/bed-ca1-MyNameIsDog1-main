@@ -49,20 +49,60 @@ module.exports.completePetQuest = (questId, callback) => {
                     return callback(error);
                 }
 
-                // Optionally, update the pet's points in the Pets table
+                // Update the pet's points in the Pets table
                 const updatePetPointsSQL = `
                     UPDATE Pets
                     SET points = points + ?
                     WHERE pet_id = ?`;
-                pool.query(updatePetPointsSQL, [reward_points, pet_id], callback);
+                pool.query(updatePetPointsSQL, [reward_points, pet_id], (error, results) => {
+                    if (error) {
+                        return callback(error);
+                    }
+
+                    // Decrease pet's health and happiness
+                    const healthDecrease = Math.floor(Math.random() * 10) + 1; // Random decrease between 1 and 10
+                    const happinessDecrease = Math.floor(Math.random() * 10) + 1; // Random decrease between 1 and 10
+                    module.exports.decreasePetStats(pet_id, -healthDecrease, -happinessDecrease, callback);
+                });
             });
         });
     });
 };
 
+module.exports.decreasePetStats = (petId, healthDecrease, happinessDecrease, callback) => {
+    const SQL = `
+        UPDATE Pets
+        SET health = GREATEST(health + ?, 0),
+            happiness = GREATEST(happiness + ?, 0)
+        WHERE pet_id = ?`;
+    const VALUES = [healthDecrease, happinessDecrease, petId];
+    pool.query(SQL, VALUES, callback);
+};
+
 module.exports.getPetRewards = (petId, callback) => {
     const SQL = `
         SELECT * FROM Rewards
+        WHERE pet_id = ?`;
+    const VALUES = [petId];
+    pool.query(SQL, VALUES, callback);
+};
+
+// Get quest count
+module.exports.getQuestCount = (callback) => {
+    const SQL = `SELECT COUNT(*) AS count FROM PetQuests WHERE status = 'completed'`;
+    pool.query(SQL, (error, results) => {
+        if (error) {
+            callback(error, null);
+        } else {
+            callback(null, results);
+        }
+    });
+};
+
+// Get pet details
+module.exports.getPetDetails = (petId, callback) => {
+    const SQL = `
+        SELECT * FROM Pets
         WHERE pet_id = ?`;
     const VALUES = [petId];
     pool.query(SQL, VALUES, callback);

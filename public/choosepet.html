@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Management</title>
+    <link rel="stylesheet" href="/css/style4.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="css/js/scripts.js" defer></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="review.html">review</a></li>
+            <li><a href="register.html">Register</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>Pet Management</h1>
+
+        <!-- Create Pet Form -->
+        <div class="form-container">
+            <h2>Add New Pet</h2>
+            <form id="create-pet-form">
+                <label for="owner_id">Owner ID:</label>
+                <input type="text" id="owner_id" name="owner_id" required><br>
+                <label for="name">Pet Name:</label>
+                <input type="text" id="name" name="name" required><br>
+                <label for="breed">Breed:</label>
+                <input type="text" id="breed" name="breed"><br>
+                <button type="submit">Add Pet</button>
+            </form>
+        </div>
+
+        <!-- Pet GIF Display -->
+        <div class="form-container">
+            <h2>New Pet Added</h2>
+            <div id="pet-gif">
+                <img src="images/pet.gif" alt="New Pet GIF">
+            </div>
+        </div>
+
+        <!-- Complete Pet Quest Form -->
+        <div class="form-container">
+            <h2>Complete Pet Quest</h2>
+            <form id="complete-petquest-form">
+                <label for="quest_id">Quest ID:</label>
+                <input type="text" id="quest_id" name="quest_id" required><br>
+                <button type="submit">Complete Quest</button>
+            </form>
+        </div>
+
+        <!-- Pet Store Points -->
+        <div class="form-container">
+            <h2>Pet Store Points</h2>
+            <form id="get-store-points-form">
+                <label for="pet_id">Pet ID:</label>
+                <input type="text" id="pet_id" name="pet_id" required><br>
+                <button type="submit">Get Points</button>
+            </form>
+            <div id="store-points"></div>
+        </div>
+
+        <!-- Pet Store -->
+        <div class="form-container">
+            <h2>Pet Store</h2>
+            <form id="pet-store-form">
+                <label for="store_pet_id">Pet ID:</label>
+                <input type="text" id="store_pet_id" name="store_pet_id" required><br>
+                <div class="item">
+                    <img src="images/dog_bone.png" alt="Dog Bone">
+                    <button type="button" class="buy-item" data-item="dog_bone">Buy Dog Bone - 50 points</button>
+                </div>
+                <div class="item">
+                    <img src="images/dog_leash.png" alt="Dog Leash">
+                    <button type="button" class="buy-item" data-item="dog_leash">Buy Dog Leash - 100 points</button>
+                </div>
+                <div class="item">
+                    <img src="images/cat_bowl.png" alt="Cat Bowl">
+                    <button type="button" class="buy-item" data-item="cat_bowl">Buy Cat Bowl - 75 points</button>
+                </div>
+            </form>
+            <div id="purchase-result"></div>
+        </div>
+
+        <!-- Pet Health and Happiness -->
+        <div class="form-container">
+            <h2>Check Pet Health and Happiness</h2>
+            <form id="get-health-happiness-form">
+                <label for="health_happiness_pet_id">Pet ID:</label>
+                <input type="text" id="health_happiness_pet_id" name="health_happiness_pet_id" required><br>
+                <button type="submit">Check Health and Happiness</button>
+            </form>
+            <div id="health-happiness"></div>
+        </div>
+
+        <!-- Feed Pet -->
+        <div class="form-container">
+            <h2>Feed Pet</h2>
+            <form id="feed-pet-form">
+                <label for="feed_pet_id">Pet ID:</label>
+                <input type="text" id="feed_pet_id" name="feed_pet_id" required><br>
+                <div class="item">
+                    <img src="images/dog_food.png" alt="Dog Food">
+                    <button type="button" class="feed-item" data-item="dog_food">Feed Dog Food - 20 points</button>
+                </div>
+                <div class="item">
+                    <img src="images/cat_food.png" alt="Cat Food">
+                    <button type="button" class="feed-item" data-item="cat_food">Feed Cat Food - 15 points</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- User Info -->
+        <div id="user-info" class="user-info"></div>
+    </div>
+</body>
+</html>

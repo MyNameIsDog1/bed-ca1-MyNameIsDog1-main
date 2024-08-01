@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews</title>
+    <link rel="stylesheet" href="css/style3.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="/home.html">Home</a>
+        <div class="navbar-right">
+            Logged in as: <span id="logged-in-user"></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="reviews" class="review-section">
+            <h4 class="m-0">Reviews</h4>
+            <div class="row">
+                <div class="col-md-12">
+                    <canvas id="reviewsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="review-list">
+            <ul id="review-list">
+                <!-- Reviews will be loaded here -->
+            </ul>
+        </div>
+
+        <div class="review-form">
+            <input type="number" id="review-amt" placeholder="Review Amount">
+            <input type="text" id="review-comment" placeholder="Comment">
+            <input type="hidden" id="username">
+            <button class="btn-primary" onclick="addReview()">Add Review</button>
+        </div>
+    </div>
+
+    <!-- Edit Review Modal -->
+    <div class="modal fade" id="editReviewModal" tabindex="-1" role="dialog" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editReviewModalLabel">Edit Review</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editReviewForm">
+                        <div class="form-group">
+                            <label for="modal-review-amt">Review Amount</label>
+                            <input type="number" class="form-control" id="modal-review-amt" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-review-comment">Comment</label>
+                            <input type="text" class="form-control" id="modal-review-comment" required>
+                        </div>
+                        <input type="hidden" id="modal-review-id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-primary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn-primary" onclick="saveReview()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('logged-in-user').innerText = localStorage.getItem('username');
+
+        let editingReviewId = null;
+
+        document.getElementById('username').value = localStorage.getItem('username');
+
+        async function loadReviews() {
+            try {
+                const response = await fetch('/api/reviews');
+                const reviews = await response.json();
+                const reviewList = document.getElementById('review-list');
+                reviewList.innerHTML = '';
+
+                reviews.forEach(review => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="d-flex">
+                            <div class="left">
+                                <span>
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="profile-pict-img img-fluid" alt="" />
+                                </span>
+                            </div>
+                            <div class="right">
+                                <h4>Review by: ${review.username} (ID: ${review.id})</h4>
+                                <div class="review-description">
+                                    <p>Review Amount: ${review.review_amt}</p>
+                                    <p>Comment: ${review.comment}</p>
+                                </div>
+                                <button class="btn-primary" onclick="editReview(${review.id}, ${review.review_amt}, '${review.comment}')">Edit</button>
+                                <button class="btn-primary" onclick="deleteReview(${review.id})">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    reviewList.appendChild(listItem);
+                });
+
+                updateChart(reviews);
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            }
+        }
+
+        function updateChart(reviews) {
+            const ctx = document.getElementById('reviewsChart').getContext('2d');
+            const reviewCounts = [0, 0, 0, 0, 0];
+
+            reviews.forEach(review => {
+                reviewCounts[review.review_amt - 1]++;
+            });
+
+            if (window.chart) {
+                window.chart.destroy();
+            }
+
+            window.chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+                    datasets: [{
+                        label: 'Review Counts',
+                        data: reviewCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function addReview() {
+            const reviewAmt = document.getElementById('review-amt').value;
+            const comment = document.getElementById('review-comment').value;
+            const username = document.getElementById('username').value;
+
+            if (reviewAmt && comment && username) {
+                try {
+                    const response = await fetch('/api/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, review_amt: parseInt(reviewAmt), comment })
+                    });
+
+                    if (response.ok) {
+                        loadReviews();
+                    } else {
+                        console.error('Error adding review');
+                        alert('An error occurred while adding the review');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while adding the review');
+                }
+            } else {
+                alert('Please fill in all required fields');
+            }
+        }
+
+        async function deleteReview(id) {
+            try {
+                const response = await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    loadReviews();
+                } else {
+                    console.error('Error deleting review');
+                    alert('An error occurred while deleting the review');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the review');
+            }
+        }
+
+        function editReview(id, reviewAmt, comment) {
+            document.getElementById('modal-review-amt').value = reviewAmt;
+            document.getElementById('modal-review-comment').value = comment;
+            document.getElementById('modal-review-id').value = id;
+
+            $('#editReviewModal').modal('show');
+        }
+
+        async function saveReview() {
+            const reviewAmt = document.getElementById('modal-review-amt').value;
+            const comment = document.getElementById('modal-review-comment').value;
+            const reviewId = parseInt(document.getElementById('modal-review-id').value);
+
+            if (reviewAmt && comment) {
+                try {
+                    const response = await fetch(`/api/reviews/${reviewId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ review_amt: parseInt(reviewAmt), comment })
+                    });
+
+                    if (response.ok) {
+                        loadReviews();
+                        $('#editReviewModal').modal('hide');
+                    } else {
+                        console.error('Error saving review');
+                        alert('An error occurred while saving the review');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the review');
+                }
+            } else {
+                alert('Please fill in all required fields');
+            }
+        }
+
+        loadReviews();
+    </script>
+
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
+

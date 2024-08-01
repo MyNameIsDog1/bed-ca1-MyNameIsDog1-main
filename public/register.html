@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Register</title>
+    <link rel="stylesheet" href="css/style2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <div class="login-wrap">
+        <div class="login-html">
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked>
+            <label for="tab-1" class="tab">Sign In</label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up">
+            <label for="tab-2" class="tab">Sign Up</label>
+            <div class="login-form">
+                <div class="sign-in-htm">
+                    <form id="loginForm">
+                        <div class="group">
+                            <label for="login-user" class="label">Username</label>
+                            <input id="login-user" type="text" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="login-pass" class="label">Password</label>
+                            <input id="login-pass" type="password" class="input" required>
+                        </div>
+                        <div class="group">
+                            <button type="submit" class="button">Sign In</button>
+                        </div>
+                        <div id="login-message"></div>
+                    </form>
+                </div>
+                <div class="sign-up-htm">
+                    <form id="registerForm">
+                        <div class="group">
+                            <label for="register-user" class="label">Username</label>
+                            <input id="register-user" type="text" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="register-pass" class="label">Password</label>
+                            <input id="register-pass" type="password" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="register-repeat-pass" class="label">Repeat Password</label>
+                            <input id="register-repeat-pass" type="password" class="input" required>
+                        </div>
+                        <div class="group">
+                            <label for="register-email" class="label">Email Address</label>
+                            <input id="register-email" type="email" class="input" required>
+                        </div>
+                        <div class="group">
+                            <button type="submit" class="button">Sign Up</button>
+                        </div>
+                        <div id="register-message"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle login
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('login-user').value;
+            const password = document.getElementById('login-pass').value;
+
+            try {
+                const response = await fetch('/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('login-message').innerText = 'Login successful';
+                    // Store the JWT token and username in localStorage
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', username);
+                    // Redirect to the home page or reviews page
+                    window.location.href = '/home.html'; // Or '/reviews.html' if that's your target
+                } else {
+                    document.getElementById('login-message').innerText = data.message || 'Login failed';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('login-message').innerText = 'An error occurred';
+            }
+        });
+
+        // Handle registration
+        document.getElementById('registerForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('register-user').value;
+            const password = document.getElementById('register-pass').value;
+            const repeatPassword = document.getElementById('register-repeat-pass').value;
+            const email = document.getElementById('register-email').value;
+
+            if (password !== repeatPassword) {
+                document.getElementById('register-message').innerText = 'Passwords do not match';
+                return;
+            }
+
+            try {
+                const response = await fetch('/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password, email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('register-message').innerText = 'User registered successfully';
+                    // Redirect to the login tab
+                    document.getElementById('tab-1').checked = true;
+                } else {
+                    document.getElementById('register-message').innerText = data.errors ? data.errors.map(err => err.msg).join(', ') : data.message || 'Registration failed';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('register-message').innerText = 'An error occurred';
+            }
+        });
+    </script>
+</body>
+</html>
